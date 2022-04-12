@@ -29,7 +29,7 @@ class Player:
 # that may be different in each object.  If there is a variable that always starts at a single value, then it is simply
 # set to that value in the init def
 # add points tires, aerodynamics, popularity for money
-    def __init__(self, owner, carname, speed, handling, braking, pittime, points, tires, aerodynamics, popularity, location):
+    def __init__(self, player, fuel, rocketStatus, popularity, location):
     # These variables are set using the parameter.  They may have the same name as the parameter, but that is not
     # necessary.
         self.owner = owner
