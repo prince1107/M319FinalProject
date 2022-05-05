@@ -29,28 +29,22 @@ class Player:
 # that may be different in each object.  If there is a variable that always starts at a single value, then it is simply
 # set to that value in the init def
 # add points tires, aerodynamics, popularity for money
-    def __init__(self, player, fuel, rocketStatus, popularity, location):
+    def __init__(self, player, fuel, status, popularity, location):
     # These variables are set using the parameter.  They may have the same name as the parameter, but that is not
     # necessary.
-        self.owner = owner
-        self.carName = carname
-        self.speed = speed
-        self.handling = handling
-        self.braking = braking
-        self.pitTime = pittime
-        self.points = points
+        self.owner = player
+        self.fuel = fuel
+        self.status = status
         self.popularity = popularity
-        self.tires = tires
-        self.aerodynamics = aerodynamics
         self.place = location
 
       
   # this def will keep track of the time spent on each lap by the car.  Time represents the total cumulative time in the race.
-    def changeRaceTime(self,num):
-      self.time+=num
+    def changeFuel(self,num):
+      self.fuel+=num
 
-    def changePoints(self,num):
-      self.points+=num
+    def changeStatus(self,num):
+      self.status+=num
 
     def changePop(self,num):
       self.popularity+=num
@@ -61,35 +55,19 @@ class Player:
       self.time = 0
   
   # The next few defs allow the statistics of the cards to be changed
-    def changeSpeed(self,num):
-      self.speed+=num
+    def changePlace(self,num):
+      self.place+=num
   
   #******************************************
   # create 2 more defs.  One will change the handling and one will change the braking
-
-    def changeBraking(self, m):
-        self.braking += m
-
-    def changeTires(self, m):
-        self.tires += m
-      
-    def changeAero(self, m):
-        self.aerodynamics += m
-
-    def changeHandling(self, m):
-        self.handling += m
-
-    def changePitTime(self, m):
-        self.pitTime += m
-  
   # The next few defs simply return the contents of a variable.  This is necessary so that the code that uses the
   # object will be able to access the data within the object.  Returns are the only way to get information out
   # of a class.  These defs are simple, but it is possible to put more code than a simple return into them.
-    def getRaceTime(self):
-      return self.time
+    def getFuel(self):
+      return self.fuel
       
-    def getPoints(self):
-      return self.points
+    def getStatus(self):
+      return self.status
 
     def getPop(self):
       return self.popularity
@@ -100,27 +78,8 @@ class Player:
     def getOwner(self):
         return self.owner
 
-    def getHandling(self):
-        return self.handling
-    
-    def getPlayerName(self):
-        return self.carName
-
-    def getTires(self):
-        return self.tires
-      
-    def getAero(self):
-        return self.aerodynamics
-
-    def getSpeed(self):
-        return self.speed
-
-    def getBraking(self):
-        return self.braking
-    
-    def getPitTime(self):
-      return self.pitTime
-
+    def getPlace(self):
+        return self.place
     
     #****************************************************
     #Create the rest of the variables needed here
@@ -145,10 +104,9 @@ myPlayer= []
 # carnames contains strings that are chosen at random later
 #******************************************
 #create an array called carnames that will have strings representing the types of cars that will race such as Porsche
-names = ["Arjun", "Hamilton", "Russell", "Verstappen", "Perez", "Leclerc", "Sainz", "Norris", "Ricciardo", "Alonso", "Ocon", "Gasly", "Tsunoda", "Vettel", "Stroll", "Bottas", "Zhou", "Latifi", "Albon", "Mazepin", "Schumacher", "Ayush", "Krish", "Kieran", "Danny", "Jason"]
 
 
-carnames = ["Lamborghini Countach", "Ferrari F40", "Porsche 918 Spyder", "Lamborghini Murcielago", "Porsche Carrera GT", "Mercedes Benz SLS AMG Black Series", "Bugatti Chiron", "Bugatti Veyron", "Lamborghini Aventador SVJ", "Lamborghini Veneno", "Lexus LFA", "McLaren Senna", "Dodge Viper ACR", "Saleen S7", "Ferrari F50", "Pagani Huayra BC", "Pagani Zonda", "Lamborghini Huracan Performante", "Mercedes Benz SLR McLaren", "Ferrari Scuderia Spider 16M", "McLaren 675 LT", "Chevrolet Corvette C7 ZR1", "Ferrari 599 GTO", "Ferrari Enzo", "Aston Martin V12 Vanquish S", "Lamborghini Gallardo Superleggera", "Koenigsegg Jesko", "Ariel Atom", "Detomaso Pantera", "Mclaren 720S Spider", "Bentley Continental GT3-R", "Jaguar XJ220", "Acura NSX", "Porsche 911 RUF CTR Yellowbird", "Porsche 959", "Hennessey Venom GT", "Mclaren F1", "Ferrari F12tdf", "Audi R8 V10 Plus", "Porsche 911 GT2 RS", "Ferrari 488 Pista", "Koenigsegg The One:1", "Aston Martin One-77", "Mercedes-Benz CLK-GTR", "McLaren Speedtail", "Apollo IE", "Mars Rover Concept"]
+names = ["Arjun", "Ayush", "Krish", "Kieran", "Danny", "Jason", "Elon Musk", "Jeffery Bezos", "MONKE", "Ayoub", "Mr. Franco"]
 
 
 # This def will create all of the Player objects with the initialized variables.  It is important to think through
@@ -160,11 +118,11 @@ carnames = ["Lamborghini Countach", "Ferrari F40", "Porsche 918 Spyder", "Lambor
 
 def createPlayers():
   n = random.choice(names)
-  myPlayer.append(Player(n, random.choice(carnames), random.randint(28, 300), random.randint(1, 50), random.randint(1, 50), random.randint(10, 100)/100, 0, random.randint(1,50), random.randint(1,50), random.randint(100,1000), 0))
+  myPlayer.append(Player(n, 0, 0, random.randint(1,50), 0))
   names.remove(n)
   for i in range(9):
     n = random.choice(names)
-    compTeam.append(Player(n, random.choice(carnames), random.randint(28, 300), random.randint(1, 50), random.randint(1, 50), random.randint(10, 100)/100, 0, random.randint(1,50), random.randint(1,50), random.randint(100,1000), 0))
+    compTeam.append(Player(n, 0, 0, random.randint(1,50), 0))
     names.remove(n)
 
   # ******************************************
