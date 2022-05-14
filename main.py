@@ -8,6 +8,9 @@ temparray = []
 money = 0
 
 
+# *******************************************************************
+# From Stack Overflow
+# *******************************************************************
 def clearConsole():
     command = 'clear'
     if os.name in ('nt', 'dos'):  # If Machine is running on Windows, use cls
@@ -16,12 +19,15 @@ def clearConsole():
 
 
 class Player:
-    def __init__(self, player, fuel, status, popularity, location):
+    def __init__(self, player, fuel, status, popularity, location, fuelperyear,
+                 popgrowth):
         self.owner = player
         self.fuel = fuel
         self.status = status
         self.popularity = popularity
         self.place = location
+        self.fgrowth = fuelperyear
+        self.pgrowth = popgrowth
 
     def changeFuel(self, num):
         self.fuel += num
@@ -32,8 +38,14 @@ class Player:
     def changePop(self, num):
         self.popularity += num
 
-    def resetTime(self):
-        self.time = 0
+    def changePGrowth(self, num):
+        self.pgrowth += num
+
+    def changeFGrowth(self, num):
+        self.fgrowth += num
+
+    def resetStatus(self):
+        self.status = 0
 
     def changePlace(self, num):
         self.place += num
@@ -53,6 +65,12 @@ class Player:
     def getPlace(self):
         return self.place
 
+    def getPGrowth(self):
+        return self.pgrowth
+
+    def getFGrowth(self):
+        return self.fgrowth
+
 
 compTeam = []
 myPlayer = []
@@ -65,13 +83,12 @@ names = [
 
 def createPlayers():
     n = random.choice(names)
-    myPlayer.append(Player(n, 0, 0, random.randint(1, 50), 0))
+    myPlayer.append(Player(n, 0, 0, random.randint(1, 50), 0, 10, 20))
     names.remove(n)
 
-    for i in range(9):
-        n = random.choice(names)
-        compTeam.append(Player(n, 0, 0, random.randint(1, 50), 0))
-        names.remove(n)
+    n = random.choice(names)
+    compTeam.append(Player(n, 0, 0, random.randint(1, 50), 0, 10, 20))
+    names.remove(n)
 
     printStats()
 
@@ -86,7 +103,9 @@ def printStats():
         print('''
 Stats for ''' + i.getOwner() + "\n Fuel = " + str(i.getFuel()) +
               "\n Status = " + str(i.getStatus()) + "\n Popularity = " +
-              str(i.getPop()) + "\n Place = " + str(i.getPlace()))
+              str(i.getPop()) + "\n Place = " + str(i.getPlace()) +
+              "\n Fuel Per Year = " + str(i.getFGrowth()) +
+              "\n Popularity Per Year = " + str(i.getPGrowth()))
 
     print('''
         
@@ -95,38 +114,29 @@ COMPUTER TEAM''')
         print('''
 Stats for ''' + i.getOwner() + "\n Fuel = " + str(i.getFuel()) +
               "\n Status = " + str(i.getStatus()) + "\n Popularity = " +
-              str(i.getPop()) + "\n Place = " + str(i.getPlace()))
+              str(i.getPop()) + "\n Place = " + str(i.getPlace()) +
+              "\n Fuel Per Year = " + str(i.getFGrowth()) +
+              "\n Popularity Per Year = " + str(i.getPGrowth()))
 
 
 def runRace():
     global myPlayer
     global temparray
 
-    myPlayer[0].resetTime()
-    for i in range(len(compTeam)):
-        compTeam[i].time = 0
 
-    print("How many laps do you want to run?")
+    print("Press 1 to run a year")
     inp = int(input(""))
 
-    for g in range(inp):
+    if inp == 1:
         for x in myPlayer:
-            temp = 40 / (math.sqrt(x.getSpeed()) + math.sqrt(x.getAero()) / 2 +
-                         math.sqrt(x.getTires()) + math.sqrt(x.getHandling()) /
-                         2 + math.sqrt(x.getBraking()) / 2)
-            temp = round(temp, 2)
-            x.changeRaceTime(temp)
-            if random.randint(1, 10) == 1:
-                x.changeRaceTime(round(x.getPitTime()))
+            x.changeFuel(x.getFGrowth())
+            x.status += x.fuel/4
+            x.changePop(x.getPGrowth())
 
         for x in compTeam:
-            temp = 40 / (math.sqrt(x.getSpeed()) + math.sqrt(x.getAero()) / 2 +
-                         math.sqrt(x.getTires()) + math.sqrt(x.getHandling()) /
-                         2 + math.sqrt(x.getBraking()) / 2)
-            temp = round(temp, 2)
-            x.changeRaceTime(temp)
-            if random.randint(1, 10) == 1:
-                x.changeRaceTime(round(x.getPitTime()))
+            x.changeFuel(x.getFGrowth())
+            x.status += x.fuel/4
+            x.changePop(x.getPGrowth())
 
     printResults()
 
@@ -134,23 +144,20 @@ def runRace():
 def randEvent():
     global money
 
-    if random.randint(1, 50) == 1:
+    if random.randint(1, 10) == 1:
         d = random.choice(temparray)
 
-        print(str(d.getOwner()) + " got a flat tire")
-        d.changeRaceTime(random.randint(1, 10))
+        print(str(d.getOwner()) + " got a random fuel donation")
 
     if random.randint(1, 100) == 1:
-        for d in temparray:
-
-            print("The Le Mans Disaster happened")
-            d.changeRaceTime(random.randint(10, 30))
-
-    if random.randint(1, 200) == 1:
         d = random.choice(temparray)
 
-        print(str(d.getOwner()) + " had a power failure")
-        d.changeRaceTime(random.randint(10, 200))
+        print(str(d.getOwner()) + "'s rocket blew up and their company lost popularity")
+
+    if random.randint(1, 20) == 1:
+        d = random.choice(temparray)
+
+        print(str(d.getOwner()) + "'s company went viral and gained a lot of attention and popularity")
 
     if random.randint(1, 200) == 1:
 
@@ -174,7 +181,9 @@ def printResults():
 
     randEvent()
 
-    temparray.sort(key=attrgetter('time'))
+    # From GeekBench
+    temparray.sort(key=attrgetter('status'))
+    # **************************************************
 
     mcar = temparray.index(myPlayer[0])
 
@@ -182,36 +191,30 @@ def printResults():
 
     for i in temparray:
         print('''
+
+
               
+Stats for ''' + i.getOwner() + "\n Fuel = " + str(i.getFuel()) +
+              "\n Status = " + str(i.getStatus()) + "\n Popularity = " +
+              str(i.getPop()) + "\n Place = " + str(i.getPlace()) +
+              "\n Fuel Per Year = " + str(i.getFGrowth()) +
+              "\n Popularity Per Year = " + str(i.getPGrowth()))
 
-          
-Stats for ''' + i.getOwner() + "\n Player = " + str(i.getPlayerName()) +
-              "\n Top Speed = " + str(i.getSpeed()) + "\n Handling = " +
-              str(i.getHandling()) + "\n Braking = " + str(i.getBraking()) +
-              "\n Pit Times: " + str(round(i.getPitTime() * 60, 2)) + " sec" +
-              "\n Tires = " + str(i.getTires()) + "\n Aerodynamics = " +
-              str(i.getAero()) + "\n Popularity = " + str(i.getPop()) +
-              "\n Points = " + str(i.getPoints()) + "\n Time = " +
-              str(i.getRaceTime()) + " minutes")
-
-    print('''
+#    print('''
 
 
           
-THE WINNER IS... ''' + temparray[0].getOwner() + "!")
+#THE WINNER IS... ''' + temparray[0].getOwner() + "!")
 
-    print('''
+#    print('''
 
 
           
-Stats for ''' + i.getOwner() + "\n Player = " + str(i.getPlayerName()) +
-          "\n Top Speed = " + str(i.getSpeed()) + "\n Handling = " +
-          str(i.getHandling()) + "\n Braking = " + str(i.getBraking()) +
-          "\n Pit Times: " + str(round(i.getPitTime() * 60, 2)) + " sec" +
-          "\n Tires = " + str(i.getTires()) + "\n Aerodynamics = " +
-          str(i.getAero()) + "\n Popularity = " + str(i.getPop()) +
-          "\n Points = " + str(i.getPoints()) + "\n Time = " +
-          str(i.getRaceTime()) + " minutes")
+#Stats for ''' + i.getOwner() + "\n Fuel = " + str(i.getFuel()) +
+#              "\n Status = " + str(i.getStatus()) + "\n Popularity = " +
+#              str(i.getPop()) + "\n Place = " + str(i.getPlace()) +
+#              "\n Fuel Per Year = " + str(i.getFGrowth()) +
+#              "\n Popularity Per Year = " + str(i.getPGrowth()))
 
     print(len(compTeam))
 
@@ -242,31 +245,31 @@ def improveStats():
     global myPlayer
     global money
 
-    i = 0
-    for h in temparray:
-        i += 1
-        if i == 1:
-            h.changePoints(25)
-        elif i == 2:
-            h.changePoints(18)
-        elif i == 3:
-            h.changePoints(15)
-        elif i == 4:
-            h.changePoints(12)
-        elif i == 5:
-            h.changePoints(10)
-        elif i == 6:
-            h.changePoints(8)
-        elif i == 7:
-            h.changePoints(6)
-        elif i == 8:
-            h.changePoints(4)
-        elif i == 9:
-            h.changePoints(2)
-        elif i == 10:
-            h.changePoints(1)
-        else:
-            pass
+#    i = 0
+#    for h in temparray:
+#        i += 1
+#        if i == 1:
+#            h.changePoints(25)
+#        elif i == 2:
+#            h.changePoints(18)
+#        elif i == 3:
+#            h.changePoints(15)
+#        elif i == 4:
+#            h.changePoints(12)
+#        elif i == 5:
+#            h.changePoints(10)
+#        elif i == 6:
+#            h.changePoints(8)
+#        elif i == 7:
+#            h.changePoints(6)
+#        elif i == 8:
+#            h.changePoints(4)
+#        elif i == 9:
+#            h.changePoints(2)
+#        elif i == 10:
+#            h.changePoints(1)
+#        else:
+#            pass
 
     myPlayer[0] = temparray[mcar]
     temparray.pop(mcar)
